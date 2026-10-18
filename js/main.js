@@ -306,7 +306,15 @@ function registerServiceWorker() {
   if (!("serviceWorker" in navigator)) return;
   const secure = location.protocol === "https:" || location.hostname === "localhost" || location.hostname === "127.0.0.1";
   if (!secure) return;
-  navigator.serviceWorker.register("./sw.js").catch(() => {});
+  let hadController = Boolean(navigator.serviceWorker.controller);
+  navigator.serviceWorker.addEventListener("controllerchange", () => {
+    if (!hadController) {
+      hadController = true;
+      return;
+    }
+    location.reload();
+  });
+  navigator.serviceWorker.register("./sw.js", { updateViaCache: "none" }).catch(() => {});
 }
 
 function init() {
