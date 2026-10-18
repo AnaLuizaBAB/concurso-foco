@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ConcursoFoco — Gerenciador de Estudos</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">
+      <span class="logo">CF</span>
+      <div>
+        <h1>ConcursoFoco</h1>
+        <p class="subtitle">Gestão de tempo de estudo para concursos públicos</p>
+      </div>
+    </div>
+    <nav class="tabs" id="tabs">
+      <button class="tab active" data-tab="dashboard">Painel</button>
+      <button class="tab" data-tab="timer">Cronômetro</button>
+      <button class="tab" data-tab="subjects">Matérias</button>
+      <button class="tab" data-tab="stats">Estatísticas</button>
+      <button class="tab" data-tab="history">Histórico</button>
+      <button class="tab" data-tab="settings">Ajustes</button>
+    </nav>
+  </header>
+
+  <main>
+    <section id="tab-dashboard" class="tab-panel active">
+      <div class="cards">
+        <div class="card stat">
+          <span class="label">Hoje</span>
+          <strong id="statToday">0min</strong>
+          <span class="hint" id="statTodayGoal"></span>
+        </div>
+        <div class="card stat">
+          <span class="label">Esta semana</span>
+          <strong id="statWeek">0min</strong>
+        </div>
+        <div class="card stat">
+          <span class="label">Este mês</span>
+          <strong id="statMonth">0min</strong>
+        </div>
+        <div class="card stat">
+          <span class="label">Sequência</span>
+          <strong id="statStreak">0 dias</strong>
+          <span class="hint">dias seguidos estudando</span>
+        </div>
+      </div>
+
+      <div class="grid-2">
+        <div class="card">
+          <h2>Meta diária</h2>
+          <div class="ring-wrap">
+            <div class="ring" id="ring"><span id="ringPct">0%</span></div>
+            <div class="ring-info">
+              <p id="ringDetail" class="hint"></p>
+            </div>
+          </div>
+        </div>
+        <div class="card">
+          <h2>Últimas sessões</h2>
+          <ul id="recentList" class="list"></ul>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>Início rápido</h2>
+        <p class="hint">Clique em uma matéria para começar a estudar agora.</p>
+        <div id="quickStart" class="chips"></div>
+      </div>
+    </section>
+
+    <section id="tab-timer" class="tab-panel">
+      <div class="card timer-card">
+        <div class="mode-switch" id="modeSwitch">
+          <button type="button" data-mode="stopwatch" class="active">Cronômetro livre</button>
+          <button type="button" data-mode="pomodoro">Pomodoro</button>
+        </div>
+
+        <label class="field">
+          Matéria
+          <select id="timerSubject"></select>
+        </label>
+
+        <div class="timer-display">
+          <span id="timerPhase" class="phase hidden">FOCO</span>
+          <span id="timerTime">00:00:00</span>
+        </div>
+
+        <div class="timer-controls">
+          <button id="btnStart" class="btn primary big">Iniciar</button>
+          <button id="btnFinish" class="btn big" disabled>Finalizar</button>
+        </div>
+
+        <label class="field">
+          Anotação (opcional)
+          <input id="timerNote" maxlength="120" placeholder="Ex.: resumo de Direito Administrativo" />
+        </label>
+        <p class="hint" id="timerHint"></p>
+      </div>
+    </section>
+
+    <section id="tab-subjects" class="tab-panel">
+      <div class="card">
+        <h2 id="subjectFormTitle">Adicionar matéria</h2>
+        <form id="subjectForm" class="row">
+          <label class="field grow">Nome
+            <input id="subjectName" required maxlength="60" placeholder="Ex.: Direito Constitucional" />
+          </label>
+          <label class="field">Cor
+            <input id="subjectColor" type="color" value="#4f8ef7" />
+          </label>
+          <label class="field">Peso no edital
+            <input id="subjectWeight" type="number" min="0.5" step="0.5" value="1" />
+          </label>
+          <button class="btn primary" type="submit" id="subjectSubmit">Adicionar</button>
+          <button class="btn" type="button" id="subjectCancel" hidden>Cancelar</button>
+        </form>
+      </div>
+
+      <div class="card">
+        <h2>Matérias cadastradas</h2>
+        <div id="subjectsList" class="subject-list"></div>
+      </div>
+    </section>
+
+    <section id="tab-stats" class="tab-panel">
+      <div class="card">
+        <div class="row-between">
+          <h2>Desempenho</h2>
+          <select id="statsPeriod">
+            <option value="7">Últimos 7 dias</option>
+            <option value="30" selected>Últimos 30 dias</option>
+            <option value="90">Últimos 90 dias</option>
+            <option value="0">Todo o período</option>
+          </select>
+        </div>
+        <div class="cards">
+          <div class="card stat">
+            <span class="label">Total no período</span>
+            <strong id="statsTotal">0min</strong>
+          </div>
+          <div class="card stat">
+            <span class="label">Média por dia ativo</span>
+            <strong id="statsAvg">0min</strong>
+          </div>
+          <div class="card stat">
+            <span class="label">Dias estudados</span>
+            <strong id="statsDays">0</strong>
+          </div>
+        </div>
+        <h3>Tempo por matéria</h3>
+        <div id="subjectStats" class="bars"></div>
+      </div>
+
+      <div class="card">
+        <h2>Meta semanal por matéria (semana atual)</h2>
+        <p class="hint">A meta semanal total é distribuída proporcionalmente ao peso de cada matéria no edital.</p>
+        <div id="goalStats" class="bars"></div>
+      </div>
+
+      <div class="card">
+        <h2>Últimos 14 dias</h2>
+        <div id="dailyChart" class="day-chart"></div>
+      </div>
+    </section>
+
+    <section id="tab-history" class="tab-panel">
+      <div class="card">
+        <h2>Registrar sessão manualmente</h2>
+        <form id="manualForm" class="row">
+          <label class="field">Início
+            <input type="datetime-local" id="manualStart" required />
+          </label>
+          <label class="field">Duração (min)
+            <input type="number" id="manualMinutes" min="1" required value="60" />
+          </label>
+          <label class="field grow">Matéria
+            <select id="manualSubject"></select>
+          </label>
+          <label class="field grow">Anotação
+            <input id="manualNote" maxlength="120" />
+          </label>
+          <button class="btn primary" type="submit">Registrar</button>
+        </form>
+      </div>
+
+      <div class="card">
+        <div class="row-between">
+          <h2>Histórico</h2>
+          <select id="historyFilter"></select>
+        </div>
+        <div id="historyList"></div>
+      </div>
+    </section>
+
+    <section id="tab-settings" class="tab-panel">
+      <div class="card">
+        <h2>Metas e pomodoro</h2>
+        <form id="settingsForm" class="row">
+          <label class="field">Meta diária (min)
+            <input type="number" id="setDailyGoal" min="10" step="10" />
+          </label>
+          <label class="field">Meta semanal (min)
+            <input type="number" id="setWeeklyGoal" min="30" step="30" />
+          </label>
+          <label class="field">Foco (min)
+            <input type="number" id="setPomodoro" min="5" step="5" />
+          </label>
+          <label class="field">Pausa (min)
+            <input type="number" id="setBreak" min="1" step="1" />
+          </label>
+          <label class="field">Pausa longa (min)
+            <input type="number" id="setLongBreak" min="5" step="5" />
+          </label>
+          <button class="btn primary" type="submit">Salvar</button>
+        </form>
+      </div>
+
+      <div class="card">
+        <h2>Backup e dados</h2>
+        <div class="row">
+          <button id="btnExport" class="btn" type="button">Exportar dados (JSON)</button>
+          <label class="btn file-btn">Importar dados
+            <input type="file" id="importFile" accept="application/json" hidden />
+          </label>
+          <button id="btnReset" class="btn danger" type="button">Apagar tudo</button>
+        </div>
+        <p class="hint">Os dados ficam salvos apenas neste navegador (localStorage).</p>
+      </div>
+    </section>
+  </main>
+
+  <div id="toast" class="toast" hidden></div>
+  <script src="app.js"></script>
+</body>
+</html>
