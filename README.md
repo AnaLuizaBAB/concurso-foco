@@ -2,6 +2,8 @@
 
 Aplicativo web estático para gestão de tempo de estudo voltado a concursos públicos. Sem build, sem dependências e sem framework: apenas HTML, CSS e JavaScript puro (ES modules), com os dados salvos no `localStorage` do navegador.
 
+**Demo ao vivo:** <https://analuizabab.github.io/concurso-foco/> (publicado pelo GitHub Pages).
+
 ## Funcionalidades
 
 - **Painel**: resumo de hoje, semana e mês, sequência de dias estudados, anel de meta diária, últimas sessões e início rápido por matéria.
