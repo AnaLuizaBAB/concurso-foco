@@ -1,0 +1,12 @@
+{
+  "name": "concursofoco",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Gestão de tempo de estudo para concursos públicos",
+  "license": "MIT",
+  "author": "Analuiza",
+  "scripts": {
+    "test": "node tests/logic.test.js"
+  }
+}

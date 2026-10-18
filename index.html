@@ -4,6 +4,9 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>ConcursoFoco — Gerenciador de Estudos</title>
+  <meta name="theme-color" content="#0b0f19" />
+  <link rel="manifest" href="manifest.webmanifest" />
+  <link rel="icon" type="image/svg+xml" href="icons/icon.svg" />
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
@@ -15,18 +18,18 @@
         <p class="subtitle">Gestão de tempo de estudo para concursos públicos</p>
       </div>
     </div>
-    <nav class="tabs" id="tabs">
-      <button class="tab active" data-tab="dashboard">Painel</button>
-      <button class="tab" data-tab="timer">Cronômetro</button>
-      <button class="tab" data-tab="subjects">Matérias</button>
-      <button class="tab" data-tab="stats">Estatísticas</button>
-      <button class="tab" data-tab="history">Histórico</button>
-      <button class="tab" data-tab="settings">Ajustes</button>
+    <nav class="tabs" id="tabs" role="tablist" aria-label="Seções do aplicativo">
+      <button class="tab active" data-tab="dashboard" role="tab" id="tabBtn-dashboard" aria-controls="tab-dashboard" aria-selected="true">Painel</button>
+      <button class="tab" data-tab="timer" role="tab" id="tabBtn-timer" aria-controls="tab-timer" aria-selected="false" tabindex="-1">Cronômetro</button>
+      <button class="tab" data-tab="subjects" role="tab" id="tabBtn-subjects" aria-controls="tab-subjects" aria-selected="false" tabindex="-1">Matérias</button>
+      <button class="tab" data-tab="stats" role="tab" id="tabBtn-stats" aria-controls="tab-stats" aria-selected="false" tabindex="-1">Estatísticas</button>
+      <button class="tab" data-tab="history" role="tab" id="tabBtn-history" aria-controls="tab-history" aria-selected="false" tabindex="-1">Histórico</button>
+      <button class="tab" data-tab="settings" role="tab" id="tabBtn-settings" aria-controls="tab-settings" aria-selected="false" tabindex="-1">Ajustes</button>
     </nav>
   </header>
 
   <main>
-    <section id="tab-dashboard" class="tab-panel active">
+    <section id="tab-dashboard" class="tab-panel active" role="tabpanel" aria-labelledby="tabBtn-dashboard">
       <div class="cards">
         <div class="card stat">
           <span class="label">Hoje</span>
@@ -71,7 +74,7 @@
       </div>
     </section>
 
-    <section id="tab-timer" class="tab-panel">
+    <section id="tab-timer" class="tab-panel" role="tabpanel" aria-labelledby="tabBtn-timer">
       <div class="card timer-card">
         <div class="mode-switch" id="modeSwitch">
           <button type="button" data-mode="stopwatch" class="active">Cronômetro livre</button>
@@ -97,11 +100,21 @@
           Anotação (opcional)
           <input id="timerNote" maxlength="120" placeholder="Ex.: resumo de Direito Administrativo" />
         </label>
+
+        <div class="quiz-fields">
+          <label class="field">Questões (opcional)
+            <input id="timerQuestions" type="number" min="0" step="1" placeholder="0" />
+          </label>
+          <label class="field" id="timerCorrectField" hidden>Acertos
+            <input id="timerCorrect" type="number" min="0" step="1" placeholder="0" />
+          </label>
+        </div>
+
         <p class="hint" id="timerHint"></p>
       </div>
     </section>
 
-    <section id="tab-subjects" class="tab-panel">
+    <section id="tab-subjects" class="tab-panel" role="tabpanel" aria-labelledby="tabBtn-subjects">
       <div class="card">
         <h2 id="subjectFormTitle">Adicionar matéria</h2>
         <form id="subjectForm" class="row">
@@ -114,6 +127,9 @@
           <label class="field">Peso no edital
             <input id="subjectWeight" type="number" min="0.5" step="0.5" value="1" />
           </label>
+          <label class="field">Meta semanal (min)
+            <input id="subjectGoal" type="number" min="1" step="5" placeholder="proporcional ao peso" />
+          </label>
           <button class="btn primary" type="submit" id="subjectSubmit">Adicionar</button>
           <button class="btn" type="button" id="subjectCancel" hidden>Cancelar</button>
         </form>
@@ -125,7 +141,7 @@
       </div>
     </section>
 
-    <section id="tab-stats" class="tab-panel">
+    <section id="tab-stats" class="tab-panel" role="tabpanel" aria-labelledby="tabBtn-stats">
       <div class="card">
         <div class="row-between">
           <h2>Desempenho</h2>
@@ -149,6 +165,14 @@
             <span class="label">Dias estudados</span>
             <strong id="statsDays">0</strong>
           </div>
+          <div class="card stat">
+            <span class="label">Questões resolvidas</span>
+            <strong id="statsQuestions">0</strong>
+          </div>
+          <div class="card stat">
+            <span class="label">Acerto médio</span>
+            <strong id="statsAccuracy">—</strong>
+          </div>
         </div>
         <h3>Tempo por matéria</h3>
         <div id="subjectStats" class="bars"></div>
@@ -156,7 +180,7 @@
 
       <div class="card">
         <h2>Meta semanal por matéria (semana atual)</h2>
-        <p class="hint">A meta semanal total é distribuída proporcionalmente ao peso de cada matéria no edital.</p>
+        <p class="hint">Matérias com meta individual usam esse valor; o restante da meta semanal é distribuído proporcionalmente ao peso no edital.</p>
         <div id="goalStats" class="bars"></div>
       </div>
 
@@ -164,9 +188,17 @@
         <h2>Últimos 14 dias</h2>
         <div id="dailyChart" class="day-chart"></div>
       </div>
+
+      <div class="card">
+        <h2>Últimas 12 semanas</h2>
+        <p class="hint">Cada célula é um dia; a intensidade de cor representa os minutos estudados.</p>
+        <div class="heatmap-scroll">
+          <div id="heatmap" class="heatmap"></div>
+        </div>
+      </div>
     </section>
 
-    <section id="tab-history" class="tab-panel">
+    <section id="tab-history" class="tab-panel" role="tabpanel" aria-labelledby="tabBtn-history">
       <div class="card">
         <h2>Registrar sessão manualmente</h2>
         <form id="manualForm" class="row">
@@ -182,6 +214,12 @@
           <label class="field grow">Anotação
             <input id="manualNote" maxlength="120" />
           </label>
+          <label class="field">Questões
+            <input type="number" id="manualQuestions" min="0" step="1" placeholder="0" />
+          </label>
+          <label class="field" id="manualCorrectField" hidden>Acertos
+            <input type="number" id="manualCorrect" min="0" step="1" placeholder="0" />
+          </label>
           <button class="btn primary" type="submit">Registrar</button>
         </form>
       </div>
@@ -195,7 +233,7 @@
       </div>
     </section>
 
-    <section id="tab-settings" class="tab-panel">
+    <section id="tab-settings" class="tab-panel" role="tabpanel" aria-labelledby="tabBtn-settings">
       <div class="card">
         <h2>Metas e pomodoro</h2>
         <form id="settingsForm" class="row">
@@ -219,6 +257,19 @@
       </div>
 
       <div class="card">
+        <h2>Aparência</h2>
+        <div class="row">
+          <label class="field grow">Tema
+            <select id="setTheme">
+              <option value="auto">Automático (sistema)</option>
+              <option value="dark">Escuro</option>
+              <option value="light">Claro</option>
+            </select>
+          </label>
+        </div>
+      </div>
+
+      <div class="card">
         <h2>Backup e dados</h2>
         <div class="row">
           <button id="btnExport" class="btn" type="button">Exportar dados (JSON)</button>
@@ -232,7 +283,52 @@
     </section>
   </main>
 
-  <div id="toast" class="toast" hidden></div>
-  <script src="app.js"></script>
+  <div id="confirmModal" class="modal" hidden>
+    <div class="modal-backdrop" data-confirm-cancel></div>
+    <div class="modal-box" role="dialog" aria-modal="true" aria-labelledby="confirmTitle">
+      <h2 id="confirmTitle">Confirmar</h2>
+      <p id="confirmMessage" class="modal-message"></p>
+      <div class="modal-actions">
+        <button type="button" class="btn" id="confirmCancel">Cancelar</button>
+        <button type="button" class="btn primary" id="confirmOk">Confirmar</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="sessionModal" class="modal" hidden>
+    <div class="modal-backdrop" data-session-cancel></div>
+    <div class="modal-box" role="dialog" aria-modal="true" aria-labelledby="sessionModalTitle">
+      <h2 id="sessionModalTitle">Editar sessão</h2>
+      <form id="sessionEditForm">
+        <div class="session-edit-grid">
+          <label class="field">Início
+            <input type="datetime-local" id="sessionEditStart" required />
+          </label>
+          <label class="field">Duração (min)
+            <input type="number" id="sessionEditMinutes" min="1" required />
+          </label>
+          <label class="field">Matéria
+            <select id="sessionEditSubject"></select>
+          </label>
+          <label class="field">Anotação
+            <input id="sessionEditNote" maxlength="120" />
+          </label>
+          <label class="field">Questões
+            <input type="number" id="sessionEditQuestions" min="0" step="1" placeholder="0" />
+          </label>
+          <label class="field" id="sessionEditCorrectField" hidden>Acertos
+            <input type="number" id="sessionEditCorrect" min="0" step="1" placeholder="0" />
+          </label>
+        </div>
+        <div class="modal-actions">
+          <button type="button" class="btn" id="sessionEditCancel">Cancelar</button>
+          <button type="submit" class="btn primary">Salvar</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div id="toast" class="toast" role="status" aria-live="polite" hidden></div>
+  <script type="module" src="js/main.js"></script>
 </body>
 </html>
